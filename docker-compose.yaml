@@ -1,0 +1,39 @@
+services:
+  db_api:
+    build: ./db_api
+    env_file: .env
+    container_name: ${DB_API_HOST}
+    ports:
+      - ${DB_API_PORT}:8000 #host:kontener
+    volumes:
+      - sqlite_data:/db_api/db/
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "${RABBIT_PORT}:${RABBIT_PORT}"
+      - "${RABBIT_ADMIN_PANEL_PORT}:${RABBIT_ADMIN_PANEL_PORT}"
+
+  input_api:
+    build: ./input_api
+    env_file: .env
+    container_name: ${INPUT_API_HOST}
+    ports:
+      - ${INPUT_API_PORT}:8000
+    depends_on:
+      - rabbitmq
+
+
+  # consumer:
+  #   build: ./consumer
+  #   env_file: .env
+  #   command: python app.py
+  #   container_name: ${CONSUMER_CONTAINER}
+  #   depends_on:
+  #     - rabbitmq
+
+
+    
+volumes:
+  sqlite_data:
+    name: "sqlite_data"
