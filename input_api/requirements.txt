@@ -2,5 +2,6 @@ fastapi
 uvicorn
 pika
 pytest
+dotenv
 flake8
 pylance
