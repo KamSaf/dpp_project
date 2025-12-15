@@ -4,7 +4,7 @@ services:
     env_file: .env
     container_name: ${DB_API_HOST}
     ports:
-      - ${DB_API_PORT}:8000 #host:kontener
+      - ${DB_API_PORT}:${DB_API_PORT} #host:kontener
     volumes:
       - sqlite_data:/db_api/db/
 
@@ -19,7 +19,7 @@ services:
     env_file: .env
     container_name: ${INPUT_API_HOST}
     ports:
-      - ${INPUT_API_PORT}:8000
+      - ${INPUT_API_PORT}:${INPUT_API_PORT}
     depends_on:
       - rabbitmq
 

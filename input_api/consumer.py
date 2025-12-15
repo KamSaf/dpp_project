@@ -1,8 +1,9 @@
 import json
 import time
 import pika
+import requests
 from pika.exceptions import AMQPConnectionError
-from src.config import RABBIT_HOST, QUEUE_NAME
+from src.config import RABBIT_HOST, QUEUE_NAME, DB_API_HOST, DB_API_PORT
 from src.object_detection import process_img
 from src.utils import load_image_from_url
 
@@ -17,7 +18,19 @@ def callback(ch, method, _, body):
     print(f"Task in progress...: {data['img_url']}")
     ppl_num = process_img(img)
     print(f"Task completed! Number of people detected: {ppl_num}")
-    ch.basic_ack(delivery_tag=method.delivery_tag)
+    print("Sending data to database...")
+    url = f"http://{DB_API_HOST}:{DB_API_PORT}/save"
+    data = {"img_url": data["img_url"], "ppl_num": ppl_num}
+    while True:
+        try:
+            response = requests.post(url, json=data)
+            response.raise_for_status()
+            print(f"[{response.status_code}] Data successfully saved to database!")
+            ch.basic_ack(delivery_tag=method.delivery_tag)
+            break
+        except requests.exceptions.RequestException as e:
+            print("Couldn't send data to server endpoint. Trying again in 5 seconds", e)
+            time.sleep(5)
 
 
 def main():

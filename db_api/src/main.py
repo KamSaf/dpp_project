@@ -12,7 +12,7 @@ def save_result(
     response: Response, data: dict = Body(...), db: Session = Depends(get_db)
 ) -> dict:
     try:
-        db.add_all([Record(img_url=data["img_url"], ppl_num=data["ppl_num"])])
+        db.add(Record(img_url=data["img_url"], ppl_num=int(data["ppl_num"])))
         db.commit()
         return {"message": "Data successfully saved to database."}
     except Exception:

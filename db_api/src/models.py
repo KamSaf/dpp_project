@@ -11,7 +11,7 @@ class Record(Base):
     __tablename__ = "record"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    img_url: Mapped[str] = mapped_column(String(50))
+    img_url: Mapped[str] = mapped_column(String(150))
     ppl_num: Mapped[int] = mapped_column(Integer)
     created_at: Mapped[DateTime] = mapped_column(
         DateTime,
