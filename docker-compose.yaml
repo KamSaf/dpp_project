@@ -24,13 +24,16 @@ services:
       - rabbitmq
 
 
-  # consumer:
-  #   build: ./consumer
-  #   env_file: .env
-  #   command: python app.py
-  #   container_name: ${CONSUMER_CONTAINER}
-  #   depends_on:
-  #     - rabbitmq
+  consumer:
+    build: ./input_api
+    env_file: .env
+    command: python consumer.py
+    environment:
+      PYTHONUNBUFFERED: "1"
+    depends_on:
+      - rabbitmq
+    deploy:
+      replicas: 3
 
 
     
