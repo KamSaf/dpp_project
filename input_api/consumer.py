@@ -3,6 +3,21 @@ import time
 import pika
 from pika.exceptions import AMQPConnectionError
 from src.config import RABBIT_HOST, QUEUE_NAME
+from src.object_detection import process_img
+from src.utils import load_image_from_url
+
+
+def callback(ch, method, _, body):
+    data = json.loads(body)
+    img = load_image_from_url(data["img_url"])
+    if img is None:
+        print(f"Cannot process image from given URL.: {data['img_url']}")
+        ch.basic_ack(delivery_tag=method.delivery_tag)
+        return
+    print(f"Task in progress...: {data['img_url']}")
+    ppl_num = process_img(img)
+    print(f"Task completed! Number of people detected: {ppl_num}")
+    ch.basic_ack(delivery_tag=method.delivery_tag)
 
 
 def main():
@@ -19,13 +34,6 @@ def main():
 
     channel = connection.channel()
     channel.queue_declare(queue=QUEUE_NAME)
-
-    def callback(ch, method, _, body):
-        data = json.loads(body)
-        print(f"Task in progress...: {data}")
-        time.sleep(5)
-        print("Task completed!")
-        ch.basic_ack(delivery_tag=method.delivery_tag)
 
     channel.basic_consume(
         queue=QUEUE_NAME,

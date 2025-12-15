@@ -1,21 +1,16 @@
-import time
+import numpy as np
 import requests
-from src.config import ROOT
+import cv2
 
 
-def save_image_from_url(url: str) -> str | None:
+def load_image_from_url(url: str) -> cv2.typing.MatLike | None:
     response = requests.head(url)
     content_type = response.headers.get("Content-Type")
-    if content_type and content_type.startswith("image/"):
-        ext = content_type.split("/")[-1]
-    else:
+    if not content_type or not content_type.startswith("image/"):
         return None
     try:
         img_data = requests.get(url).content
+        img_array = np.frombuffer(img_data, dtype=np.uint8)
+        return cv2.imdecode(img_array, cv2.IMREAD_COLOR)
     except Exception:
-        return None
-    file_name = f"{str(time.time()).replace('.', '')}.{ext}"
-    file_path = f"{ROOT}/images/{file_name}"
-    with open(file_path, "wb") as handler:
-        handler.write(img_data)
-    return file_name
+        raise ValueError("Invalid data provided.")

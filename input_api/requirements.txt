@@ -1,6 +1,10 @@
+numpy
+opencv-python-headless
+imutils
 fastapi
 uvicorn
 pika
+requests
 pytest
 dotenv
 flake8

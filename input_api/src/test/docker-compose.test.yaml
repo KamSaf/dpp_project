@@ -1,6 +1,8 @@
 services:
   test-rabbitmq:
     image: rabbitmq:3-management
+    env_file:
+      - .env
     ports:
       - "${TEST_RABBIT_PORT}:${TEST_RABBIT_PORT}"
       - "${TEST_RABBIT_ADMIN_PANEL_PORT}:${TEST_RABBIT_ADMIN_PANEL_PORT}"
